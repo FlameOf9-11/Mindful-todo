@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/routes/app_routes.dart';
 import 'package:flutter_application_1/screens/todo_screen.dart';
 import 'package:flutter_application_1/core/theme/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -295,8 +296,9 @@ class LoginScreenState extends State<LoginScreen> {
                   // Places the icon on the right (after the label)
                   iconAlignment: IconAlignment.end,
                   onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => TodoScreen()),
+                    Navigator.pushReplacementNamed(
+                      context,
+                      AppRoutes.homeRoute,
                     );
                   },
                   label: Text(
@@ -334,12 +336,28 @@ class LoginScreenState extends State<LoginScreen> {
                       color: AppColors.textPrimary,
                     ),
                     children: [
-                      TextSpan(
-                        text: ' Sign Up',
-                        style: GoogleFonts.plusJakartaSans(
-                          color: AppColors.textLink,
-                          fontWeight: FontWeight.w600,
-                          decoration: TextDecoration.none,
+                      WidgetSpan(
+                        alignment: PlaceholderAlignment.middle,
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            minimumSize: Size.zero,
+                            padding: EdgeInsets.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          onPressed: () {
+                            Navigator.pushReplacementNamed(
+                              context,
+                              AppRoutes.signupRoute,
+                            );
+                          },
+                          child: Text(
+                            ' Sign Up',
+                            style: GoogleFonts.plusJakartaSans(
+                              color: AppColors.textLink,
+                              fontWeight: FontWeight.w600,
+                              decoration: TextDecoration.none,
+                            ),
+                          ),
                         ),
                       ),
                     ],

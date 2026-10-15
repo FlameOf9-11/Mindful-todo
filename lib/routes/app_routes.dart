@@ -1,7 +1,7 @@
 abstract class AppRoutes {
-  String loginRoute = '/login_screen';
-  String signupRoute = '/signup_screen';
-  String homeRoute = '/todo_screen';
+  static const String loginRoute = '/login_screen';
+  static const String signupRoute = '/signup_screen';
+  static const String homeRoute = '/todo_screen';
 
 
 }

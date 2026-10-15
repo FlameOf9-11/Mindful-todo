@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/core/theme/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_application_1/routes/app_routes.dart';
+
 class SignupScreen extends StatefulWidget {
-  const SignupScreen({super.key, required this.title});
+  const SignupScreen({super.key});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -13,15 +15,13 @@ class SignupScreen extends StatefulWidget {
   // used by the build method of the State. Fields in a Widget subclass are
   // always marked "final".
 
-  final String title;
-
   @override
   State<SignupScreen> createState() => SignupScreenState();
 }
 
 class SignupScreenState extends State<SignupScreen> {
   //variables
-  int _counter = 0;
+
   bool is_visibile = false;
   final linkStyle = GoogleFonts.plusJakartaSans(
     color: AppColors.textLink,
@@ -33,12 +33,6 @@ class SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       body: Center(
@@ -308,7 +302,9 @@ class SignupScreenState extends State<SignupScreen> {
                 ),
                 // Places the icon on the right (after the label)
                 iconAlignment: IconAlignment.end,
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, AppRoutes.homeRoute);
+                },
                 label: Text(
                   'Create Account',
                   style: GoogleFonts.plusJakartaSans(
@@ -350,23 +346,41 @@ class SignupScreenState extends State<SignupScreen> {
                 ),
               ),
               Spacer(),
+
               Padding(
-                padding: const EdgeInsets.fromLTRB(80, 0, 80, 40),
+                
+                padding: const EdgeInsets.fromLTRB(70, 0, 70, 40),
                 child: Text.rich(
                   textAlign: TextAlign.center,
                   TextSpan(
-                    text: 'Already have an account?  ',
+                    text: 'Already have an account?',
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 13,
                       color: AppColors.textPrimary,
                     ),
                     children: [
-                      TextSpan(
-                        text: ' Log In',
-                        style: GoogleFonts.plusJakartaSans(
-                          color: AppColors.textLink,
-                          fontWeight: FontWeight.w600,
-                          decoration: TextDecoration.none,
+                      WidgetSpan(
+                        alignment: PlaceholderAlignment.middle,
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            minimumSize: Size.zero,
+                            padding: EdgeInsets.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          onPressed: () {
+                            Navigator.pushReplacementNamed(
+                              context,
+                              AppRoutes.loginRoute,
+                            );
+                          },
+                          child: Text(
+                            'Log In',
+                            style: GoogleFonts.plusJakartaSans(
+                              color: AppColors.textLink,
+                              fontWeight: FontWeight.w600,
+                              decoration: TextDecoration.none,
+                            ),
+                          ),
                         ),
                       ),
                     ],

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/routes/app_router.dart';
+import 'package:flutter_application_1/routes/app_routes.dart';
 import 'package:flutter_application_1/screens/login_screen.dart';
 import 'screens/todo_screen.dart';
 import 'package:flutter_application_1/core/theme/app_colors.dart'; // Ensure this matches your file name
@@ -19,7 +21,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryGreen),
         useMaterial3: true,
       ),
-      home: LoginScreen(), // Points to the Stateful widget we just created
+      initialRoute: AppRoutes.loginRoute,
+      onGenerateRoute: AppRouter().onGenerateRoute, // Points to the Stateful widget we just created
     );
   }
 }
