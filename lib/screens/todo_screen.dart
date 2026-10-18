@@ -3,6 +3,8 @@ import '../models/api_client.dart';
 import '../models/todo_service.dart';
 import '../models/todo.dart';
 import '../models/todo_filter.dart'; // Added the new file here!
+import '../models/token_storage.dart';
+import '../routes/app_routes.dart';
 
 class TodoScreen extends StatefulWidget {
   const TodoScreen({super.key});
@@ -21,8 +23,20 @@ class _TodoScreenState extends State<TodoScreen> {
   List<Todo> _todos = [];
   bool _isLoading = true;
   String? _errorMessage;
-  
+
   TodoFilter _currentFilter = TodoFilter.all;
+
+  //methods
+  Future<void> _logout() async {
+    await TokenStorage.deleteToken(); // Clears stored JWT
+    if (mounted) {
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        AppRoutes.loginRoute,
+        (route) => false, // Removes all back history
+      );
+    }
+  }
 
   @override
   void initState() {
@@ -83,12 +97,12 @@ class _TodoScreenState extends State<TodoScreen> {
       final created = await _todoService.addTodo(newTodo);
 
       setState(() {
-        _todos.insert(0, created); 
+        _todos.insert(0, created);
       });
 
       _titleController.clear();
       _descController.clear();
-      FocusScope.of(context).unfocus(); 
+      FocusScope.of(context).unfocus();
     } catch (e) {
       _showErrorSnackBar('Failed to add task: $e');
     }
@@ -101,7 +115,9 @@ class _TodoScreenState extends State<TodoScreen> {
     if (originalIndex == -1) return;
 
     final originalTodo = _todos[originalIndex];
-    final toggledTodo = originalTodo.copyWith(isCompleted: !originalTodo.isCompleted);
+    final toggledTodo = originalTodo.copyWith(
+      isCompleted: !originalTodo.isCompleted,
+    );
 
     setState(() {
       _todos[originalIndex] = toggledTodo;
@@ -109,7 +125,7 @@ class _TodoScreenState extends State<TodoScreen> {
 
     try {
       final updatedTodo = await _todoService.updateTodo(toggledTodo);
-      
+
       setState(() {
         final verifyIndex = _todos.indexWhere((t) => t.id == updatedTodo.id);
         if (verifyIndex != -1) {
@@ -168,14 +184,65 @@ class _TodoScreenState extends State<TodoScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Tasks',
-                          style: TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF1B1D1C),
-                            letterSpacing: -0.5,
-                          ),
+                        // ✅ AFTER: Tasks title on the left, Logout icon on the right
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Text(
+                              'Tasks',
+                              style: TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1B1D1C),
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                            IconButton(
+                              tooltip: 'Log Out',
+                              splashRadius: 20,
+                              icon: const Icon(
+                                Icons.logout_rounded,
+                                size: 22,
+                                color: Color(
+                                  0xFF6B7B72,
+                                ), // Matches input hint / secondary tone
+                              ),
+                              onPressed: () {
+                                // Optional: Show a quick confirmation dialog before logging out
+                                showDialog(
+                                  context: context,
+                                  builder: (ctx) => AlertDialog(
+                                    title: const Text('Log Out'),
+                                    content: const Text(
+                                      'Are you sure you want to log out?',
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(ctx),
+                                        child: const Text(
+                                          'Cancel',
+                                          style: TextStyle(color: Colors.grey),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(ctx);
+                                          _logout();
+                                        },
+                                        child: const Text(
+                                          'Log Out',
+                                          style: TextStyle(
+                                            color: Colors.redAccent,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 16),
                         _buildInputCard(),
@@ -184,10 +251,12 @@ class _TodoScreenState extends State<TodoScreen> {
                       ],
                     ),
                   ),
-                  const Divider(height: 1, thickness: 1, color: Color(0xFFECEFEF)),
-                  Expanded(
-                    child: _buildTaskList(),
+                  const Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: Color(0xFFECEFEF),
                   ),
+                  Expanded(child: _buildTaskList()),
                 ],
               ),
             ),
@@ -244,10 +313,16 @@ class _TodoScreenState extends State<TodoScreen> {
                   padding: const EdgeInsets.only(left: 28),
                   child: TextField(
                     controller: _descController,
-                    style: const TextStyle(fontSize: 13, color: Color(0xFF45504A)),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF45504A),
+                    ),
                     decoration: const InputDecoration(
                       hintText: 'Add description or notes...',
-                      hintStyle: TextStyle(color: Color(0xFFA0ABA5), fontSize: 13),
+                      hintStyle: TextStyle(
+                        color: Color(0xFFA0ABA5),
+                        fontSize: 13,
+                      ),
                       isDense: true,
                       contentPadding: EdgeInsets.zero,
                       border: InputBorder.none,
@@ -289,7 +364,7 @@ class _TodoScreenState extends State<TodoScreen> {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min, 
+        mainAxisSize: MainAxisSize.min,
         children: [
           _buildFilterButton('All', TodoFilter.all),
           _buildFilterButton('Not Completed', TodoFilter.notCompleted),
@@ -320,7 +395,7 @@ class _TodoScreenState extends State<TodoScreen> {
                     color: Colors.black.withOpacity(0.04),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
-                  )
+                  ),
                 ]
               : [],
         ),
@@ -329,7 +404,9 @@ class _TodoScreenState extends State<TodoScreen> {
           style: TextStyle(
             fontSize: 13,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-            color: isSelected ? const Color(0xFF232B27) : const Color(0xFF6B7B72),
+            color: isSelected
+                ? const Color(0xFF232B27)
+                : const Color(0xFF6B7B72),
           ),
         ),
       ),
@@ -358,7 +435,10 @@ class _TodoScreenState extends State<TodoScreen> {
               const SizedBox(height: 12),
               TextButton(
                 onPressed: _fetchTodos,
-                child: const Text('Try Again', style: TextStyle(color: Color(0xFF345444))),
+                child: const Text(
+                  'Try Again',
+                  style: TextStyle(color: Color(0xFF345444)),
+                ),
               ),
             ],
           ),
@@ -389,10 +469,15 @@ class _TodoScreenState extends State<TodoScreen> {
             border: Border.all(color: const Color(0xFFE8ECE9)),
           ),
           child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 2,
+            ),
             leading: Checkbox(
               activeColor: const Color(0xFF345444),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5),
+              ),
               value: todo.isCompleted,
               onChanged: (_) => _toggleStatus(todo),
             ),
@@ -401,8 +486,12 @@ class _TodoScreenState extends State<TodoScreen> {
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
-                color: todo.isCompleted ? const Color(0xFFA5AEA8) : const Color(0xFF252D29),
-                decoration: todo.isCompleted ? TextDecoration.lineThrough : null,
+                color: todo.isCompleted
+                    ? const Color(0xFFA5AEA8)
+                    : const Color(0xFF252D29),
+                decoration: todo.isCompleted
+                    ? TextDecoration.lineThrough
+                    : null,
               ),
             ),
             subtitle: todo.description != null && todo.description!.isNotEmpty
@@ -410,12 +499,18 @@ class _TodoScreenState extends State<TodoScreen> {
                     todo.description!,
                     style: TextStyle(
                       fontSize: 12,
-                      color: todo.isCompleted ? const Color(0xFFB8C0BA) : const Color(0xFF6B7770),
+                      color: todo.isCompleted
+                          ? const Color(0xFFB8C0BA)
+                          : const Color(0xFF6B7770),
                     ),
                   )
                 : null,
             trailing: IconButton(
-              icon: const Icon(Icons.close_rounded, size: 20, color: Color(0xFFA7B1AA)),
+              icon: const Icon(
+                Icons.close_rounded,
+                size: 20,
+                color: Color(0xFFA7B1AA),
+              ),
               splashRadius: 18,
               onPressed: () {
                 if (todo.id != null) {
