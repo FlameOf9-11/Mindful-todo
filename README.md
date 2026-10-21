@@ -8,10 +8,10 @@ A clean, modern, and mindful productivity app designed to keep your daily tasks 
 
 [![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
-[![GitHub Release](https://img.shields.io/github/v/release/FlameOf9-11/toDoApp?style=for-the-badge&color=345444)](https://github.com/FlameOf9-11/toDoApp/releases/latest)
-[![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS%20%7C%20Web-lightgrey?style=for-the-badge)](https://github.com/FlameOf9-11/toDoApp)
+[![GitHub Release](https://img.shields.io/github/v/release/FlameOf9-11/Mindful-todo?style=for-the-badge&color=345444)](https://github.com/FlameOf9-11/Mindful-todo/releases/latest)
+[![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS%20%7C%20Web-lightgrey?style=for-the-badge)](https://github.com/FlameOf9-11/Mindful-todo)
 
-[Download APK](https://github.com/FlameOf9-11/toDoApp/releases/latest) • [Features](#-features) • [Quick Start](#-getting-started) • [Architecture](#-project-structure) • [Tech Stack](#-tech-stack)
+[Download APK](https://github.com/FlameOf9-11/Mindful-todo/releases/latest) • [Features](#-features) • [Quick Start](#-getting-started) • [Architecture](#-project-structure) • [Tech Stack](#-tech-stack)
 
 </div>
 
@@ -53,8 +53,8 @@ A clean, modern, and mindful productivity app designed to keep your daily tasks 
 
 You can immediately install the latest pre-compiled Android release:
 
-1. Head to the [Latest GitHub Release](https://github.com/FlameOf9-11/toDoApp/releases/latest).
-2. Download [`app-release.apk`](https://github.com/FlameOf9-11/toDoApp/releases/download/v1.0.0/app-release.apk).
+1. Head to the [Latest GitHub Release](https://github.com/FlameOf9-11/Mindful-todo/releases/latest).
+2. Download [`app-release.apk`](https://github.com/FlameOf9-11/Mindful-todo/releases/download/v1.0.0/app-release.apk).
 3. Open the APK on your Android device and confirm installation.
 
 ---
@@ -110,8 +110,8 @@ Follow these steps to run the application locally from source:
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/FlameOf9-11/toDoApp.git
-cd toDoApp/flutter_application_1
+git clone https://github.com/FlameOf9-11/Mindful-todo.git
+cd Mindful-todo/flutter_application_1
 ```
 
 ### 2. Install Dependencies
