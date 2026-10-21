@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/core/theme/app_colors.dart';
+import 'package:Mindful/core/theme/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_application_1/routes/app_routes.dart';
+import 'package:Mindful/routes/app_routes.dart';
 import '../models/auth_service.dart';
 
 class SignupScreen extends StatefulWidget {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/routes/app_routes.dart';
-import 'package:flutter_application_1/screens/login_screen.dart';
-import 'package:flutter_application_1/screens/signup_screen.dart';
-import 'package:flutter_application_1/screens/todo_screen.dart';
+import 'package:Mindful/routes/app_routes.dart';
+import 'package:Mindful/screens/login_screen.dart';
+import 'package:Mindful/screens/signup_screen.dart';
+import 'package:Mindful/screens/todo_screen.dart';
 
 class AppRouter {
   Route<dynamic> onGenerateRoute(RouteSettings settings) {

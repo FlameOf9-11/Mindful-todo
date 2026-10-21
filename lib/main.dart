@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/models/token_storage.dart';
-import 'package:flutter_application_1/routes/app_router.dart';
-import 'package:flutter_application_1/routes/app_routes.dart';
-import 'package:flutter_application_1/screens/login_screen.dart';
-import 'screens/todo_screen.dart';
-import 'package:flutter_application_1/core/theme/app_colors.dart'; // Ensure this matches your file name
+import 'package:Mindful/models/token_storage.dart';
+import 'package:Mindful/routes/app_router.dart';
+import 'package:Mindful/routes/app_routes.dart';
+import 'package:Mindful/core/theme/app_colors.dart'; // Ensure this matches your file name
 
 //to display a message across the screens
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();

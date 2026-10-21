@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'api_endpoints.dart';
 import '../models/token_storage.dart';
 import '../main.dart';
-import 'package:flutter_application_1/routes/app_routes.dart';
+import 'package:Mindful/routes/app_routes.dart';
 
 class ApiClient {
   late final Dio _dio;
