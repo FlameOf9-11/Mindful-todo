@@ -29,6 +29,8 @@ class _TodoScreenState extends State<TodoScreen> {
   //methods
   Future<void> _logout() async {
     await TokenStorage.deleteToken(); // Clears stored JWT
+    //remove the email as well so the remember me button doesn't use it
+    // await TokenStorage.saveRememberMe(remember: true, email: '',password: '');
     if (mounted) {
       Navigator.pushNamedAndRemoveUntil(
         context,
@@ -43,6 +45,11 @@ class _TodoScreenState extends State<TodoScreen> {
     super.initState();
     _todoService = TodoService(_apiClient);
     _fetchTodos();
+    //test for 401 code
+
+    //  TokenStorage.saveToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjMsImVtYWlsIjoieW91c2ZAZ3MuY29tIiwiaWF0IjoxNzkyMzkyODMwLCJleHAiOjE3OTIzOTMxMzB9.Mc8caVW9Rl9BEK6MRLTKzgaEGcqP_NvPJgE67Kldr2A").then((_) {
+
+    //  });
   }
 
   @override

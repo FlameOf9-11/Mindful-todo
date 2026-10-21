@@ -200,7 +200,10 @@ class SignupScreenState extends State<SignupScreen> {
                             ),
                             filled: true,
                             fillColor: AppColors.inputBackground,
+                            
                           ),
+                          keyboardType: TextInputType.name,
+                          
                         ),
                       ),
                       SizedBox(height: 16),
@@ -350,19 +353,26 @@ class SignupScreenState extends State<SignupScreen> {
                       ),
                       SizedBox(height: 16),
                       FilledButton.icon(
-                        icon: const Icon(
-                          Icons.arrow_forward, // Or Icons.east
-                          size: 20,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        icon: _isLoading
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Icon(
+                                Icons.arrow_forward, // Or Icons.east
+                                size: 20,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
                         // Places the icon on the right (after the label)
                         iconAlignment: IconAlignment.end,
-                        onPressed: () {
-                          _handleSignup();
-                        },
+                        onPressed: _isLoading ? null : _handleSignup,
                         label: Text(
-                          'Create Account',
+                          _isLoading ? 'Creating Account...' : 'Create Account',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,

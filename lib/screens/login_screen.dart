@@ -39,28 +39,57 @@ class LoginScreenState extends State<LoginScreen> {
   final AuthService _authService = AuthService();
   bool _isLoading = false;
 
+  //remember me button values to be used as profile instead of login again(autofill)
+  List<Map<String, dynamic>> _savedAccounts = [];
+  bool _showSavedAccounts = false;
 
+  //methods
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     _loadSavedCredentials();
   }
-  Future<void> _loadSavedCredentials() async {
-  final data = await TokenStorage.getSavedCredentials();
-  if (mounted && data['remember'] == true) {
-    setState(() {
-      _rememberMe = true;
-      _emailController.text = data['email'];
-    });
+  
+
+Future<void> _loadSavedCredentials() async {
+    final accounts = await TokenStorage.getSavedAccounts();
+    if (mounted && accounts.isNotEmpty) {
+      setState(() {
+        _savedAccounts = accounts;
+        _showSavedAccounts = true; // Show profiles by default if they exist
+      });
+    }
   }
-}
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+void _quickLogin(String email, String password) async {
+    setState(() => _isLoading = true);
+    try {
+      await _authService.login(email: email, password: password);
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, AppRoutes.homeRoute);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll('Exception: ', '')),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   // void _handleLogin () {
@@ -91,9 +120,15 @@ class LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
     try {
       await _authService.login(email: email, password: password);
+
+      await TokenStorage.saveRememberMe(
+          remember: _rememberMe,
+          email: email,
+          password: password,
+        );
       if (mounted) {
         Navigator.pushReplacementNamed(context, AppRoutes.homeRoute);
-        await TokenStorage.saveRememberMe(remember: _rememberMe, email: email);
+        
       }
     } catch (e) {
       if (mounted) {
@@ -251,183 +286,311 @@ class LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       SizedBox(height: 24),
-                      Text(
-                        'Email address',
-                        style: GoogleFonts.plusJakartaSans(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      TextField(
-                        controller: _emailController,
-                        //style of user input
-                        style: GoogleFonts.plusJakartaSans(
-                          color: AppColors.textPrimary,
-                        ),
-                        decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.alternate_email_outlined),
-                          contentPadding: EdgeInsets.all(18),
-                          border: InputBorder.none,
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          hint: Text(
-                            'CJ@gs.com',
-                            style: GoogleFonts.plusJakartaSans(
-                              color: AppColors.textHint,
-                              fontSize: 16,
-                            ),
-                          ),
-                          filled: true,
-                          fillColor: AppColors.inputBackground,
-                        ),
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        'Password',
-                        style: GoogleFonts.plusJakartaSans(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      TextField(
-                        controller: _passwordController,
-                        //style of user input
-                        style: GoogleFonts.plusJakartaSans(
-                          color: AppColors.textPrimary,
-                        ),
-                        decoration: InputDecoration(
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              is_visibile
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                is_visibile = !is_visibile;
-                              });
-                            },
-                          ),
-                          prefixIcon: Icon(Icons.lock_open_outlined),
-                          contentPadding: EdgeInsets.all(18),
-                          border: InputBorder.none,
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          hint: Text(
-                            '••••••••',
-                            style: GoogleFonts.plusJakartaSans(
-                              color: AppColors.textHint,
-                              fontSize: 16,
-                            ),
-                          ),
-                          filled: true,
-                          fillColor: AppColors.inputBackground,
-                        ),
-                        keyboardType: TextInputType.visiblePassword,
-                        obscureText: !is_visibile,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      if (_showSavedAccounts && _savedAccounts.isNotEmpty)
+                        Column(
+                          children: [
+                            // Generate a card for each saved account
+                            ..._savedAccounts.map((account) {
+                              final email = account['email'] ?? '';
+                              final password = account['password'] ?? '';
+                              final prefix = email.split('@').first;
+                              final name = prefix.isNotEmpty 
+                                  ? prefix[0].toUpperCase() + prefix.substring(1) 
+                                  : 'U';
 
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Checkbox(
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
-                                visualDensity: VisualDensity.compact,
-                                side: BorderSide.none,
-                                value: _rememberMe,
-                                onChanged: (bool? value) {
-                                  setState(() {
-                                    _rememberMe = value ?? false;
-                                  });
-                                },
-                                shape: CircleBorder(),
-                                fillColor:
-                                    WidgetStateProperty.resolveWith<Color>((
-                                      Set<WidgetState> states,
-                                    ) {
-                                      if (states.contains(
-                                        WidgetState.selected,
-                                      )) {
-                                        return const Color(0xFF2E4F3E);
-                                      }
-                                      return const Color(0xFFE0E3DF);
-                                    }),
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: InkWell(
+                                  onTap: _isLoading ? null : () => _quickLogin(email, password),
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(color: const Color(0xFFE8ECE9)),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.03),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        CircleAvatar(
+                                          backgroundColor: const Color(0xFFD3EEDD),
+                                          foregroundColor: const Color(0xFF2E4F3E),
+                                          radius: 24,
+                                          child: Text(
+                                            name.substring(0, 1).toUpperCase(),
+                                            style: GoogleFonts.plusJakartaSans(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 16),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                name,
+                                                style: GoogleFonts.plusJakartaSans(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
+                                                  color: const Color(0xFF1E2822),
+                                                ),
+                                              ),
+                                              Text(
+                                                email,
+                                                style: GoogleFonts.plusJakartaSans(
+                                                  fontSize: 13,
+                                                  color: const Color(0xFF6B7A70),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: const BoxDecoration(
+                                            color: Color(0xFFF1F5F2),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: _isLoading
+                                              ? const SizedBox(
+                                                  width: 16,
+                                                  height: 16,
+                                                  child: CircularProgressIndicator(
+                                                    strokeWidth: 2,
+                                                    color: Color(0xFF2E4F3E),
+                                                  ),
+                                                )
+                                              : const Icon(
+                                                  Icons.arrow_forward,
+                                                  size: 16,
+                                                  color: Color(0xFF6B7A70),
+                                                ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+
+                            const SizedBox(height: 12),
+                            TextButton.icon(
+                              onPressed: () {
+                                setState(() {
+                                  _showSavedAccounts = false; // Switch to text fields
+                                  _emailController.clear();
+                                  _passwordController.clear();
+                                  _rememberMe = false;
+                                });
+                              },
+                              icon: const Icon(
+                                Icons.add_circle_outline,
+                                size: 18,
+                                color: Color(0xFF345444),
                               ),
-
-                              Text(
-                                'Remember me',
+                              label: Text(
+                                'Log in with another account',
                                 style: GoogleFonts.plusJakartaSans(
-                                  color: AppColors.textPrimary,
-                                  fontWeight: FontWeight.w500,
+                                  color: const Color(0xFF345444),
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
-                            ],
-                          ),
-                          Text.rich(
-                            TextSpan(
-                              text: 'Forgot password?',
-                              style: _forget_pass_config,
                             ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        child: FilledButton.icon(
-                          icon: const Icon(
-                            Icons.arrow_forward, // Or Icons.east
-                            size: 20,
-                            color: Colors.white,
-                          ),
-                          // Places the icon on the right (after the label)
-                          iconAlignment: IconAlignment.end,
-                          onPressed: () {
-                            _handleLogin();
-                          },
-                          label: Text(
-                            'Log In',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.inputBackground,
+                          ],
+                        )
+                      else
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Email address',
+                              style: GoogleFonts.plusJakartaSans(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            textAlign: TextAlign.center,
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryGreen,
-                            // padding: EdgeInsets.fromLTRB(120, 16, 120, 16),
-                            alignment: Alignment.center,
-                            minimumSize: Size(350, 55),
+                            SizedBox(height: 4),
+                            TextField(
+                              controller: _emailController,
+                              //style of user input
+                              style: GoogleFonts.plusJakartaSans(
+                                color: AppColors.textPrimary,
+                              ),
+                              decoration: InputDecoration(
+                                prefixIcon: Icon(
+                                  Icons.alternate_email_outlined,
+                                ),
+                                contentPadding: EdgeInsets.all(18),
+                                border: InputBorder.none,
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                hint: Text(
+                                  'CJ@gs.com',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    color: AppColors.textHint,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                filled: true,
+                                fillColor: AppColors.inputBackground,
+                              ),
+                              keyboardType: TextInputType.emailAddress,
+                            ),
+                            SizedBox(height: 16),
+                            Text(
+                              'Password',
+                              style: GoogleFonts.plusJakartaSans(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            TextField(
+                              controller: _passwordController,
+                              //style of user input
+                              style: GoogleFonts.plusJakartaSans(
+                                color: AppColors.textPrimary,
+                              ),
+                              decoration: InputDecoration(
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    is_visibile
+                                        ? Icons.visibility_outlined
+                                        : Icons.visibility_off_outlined,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      is_visibile = !is_visibile;
+                                    });
+                                  },
+                                ),
+                                prefixIcon: Icon(Icons.lock_open_outlined),
+                                contentPadding: EdgeInsets.all(18),
+                                border: InputBorder.none,
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                hint: Text(
+                                  '••••••••',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    color: AppColors.textHint,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                filled: true,
+                                fillColor: AppColors.inputBackground,
+                              ),
+                              keyboardType: TextInputType.visiblePassword,
+                              obscureText: !is_visibile,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Checkbox(
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      visualDensity: VisualDensity.compact,
+                                      side: BorderSide.none,
+                                      value: _rememberMe,
+                                      onChanged: (bool? value) {
+                                        setState(() {
+                                          _rememberMe = value ?? false;
+                                        });
+                                      },
+                                      shape: CircleBorder(),
+                                      fillColor:
+                                          WidgetStateProperty.resolveWith<
+                                            Color
+                                          >((Set<WidgetState> states) {
+                                            if (states.contains(
+                                              WidgetState.selected,
+                                            )) {
+                                              return const Color(0xFF2E4F3E);
+                                            }
+                                            return const Color(0xFFE0E3DF);
+                                          }),
+                                    ),
+
+                                    Text(
+                                      'Remember me',
+                                      style: GoogleFonts.plusJakartaSans(
+                                        color: AppColors.textPrimary,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Text.rich(
+                                  TextSpan(
+                                    text: 'Forgot password?',
+                                    style: _forget_pass_config,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
+                            SizedBox(height: 16),
+                            SizedBox(
+                              width: double.infinity,
+                              child: FilledButton.icon(
+                                icon: const Icon(
+                                  Icons.arrow_forward, // Or Icons.east
+                                  size: 20,
+                                  color: Colors.white,
+                                ),
+                                // Places the icon on the right (after the label)
+                                iconAlignment: IconAlignment.end,
+                                onPressed: () {
+                                  _handleLogin();
+                                },
+                                label: Text(
+                                  'Log In',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.inputBackground,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  textAlign: TextAlign.center,
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primaryGreen,
+                                  // padding: EdgeInsets.fromLTRB(120, 16, 120, 16),
+                                  alignment: Alignment.center,
+                                  minimumSize: Size(350, 55),
+
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
                       Spacer(),
 
                       Center(

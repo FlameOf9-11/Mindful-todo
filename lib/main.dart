@@ -6,6 +6,9 @@ import 'package:flutter_application_1/screens/login_screen.dart';
 import 'screens/todo_screen.dart';
 import 'package:flutter_application_1/core/theme/app_colors.dart'; // Ensure this matches your file name
 
+//to display a message across the screens
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -20,6 +23,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      //attaching the global messenger
+      navigatorKey: navigatorKey,
+      scaffoldMessengerKey: scaffoldMessengerKey,
       title: 'Todo App',
       debugShowCheckedModeBanner: false, // Removes the debug banner on the top right
       theme: ThemeData(

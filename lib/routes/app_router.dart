@@ -9,13 +9,13 @@ class AppRouter {
     switch (settings.name) {
       case AppRoutes.loginRoute:
         return MaterialPageRoute(builder: (_) => LoginScreen());
-        break;
+
       case AppRoutes.signupRoute:
         return MaterialPageRoute(builder: (_) => SignupScreen());
-        break;
+
       case AppRoutes.homeRoute:
         return MaterialPageRoute(builder: (_) => TodoScreen());
-        break;
+
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

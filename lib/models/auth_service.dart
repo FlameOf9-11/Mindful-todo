@@ -28,8 +28,7 @@ class AuthService {
         data: {'name': name, 'email': email, 'password': password},
       );
 
-      final token = response.data['token'] as String;
-      await TokenStorage.saveToken(token);
+      await login(email: email,password: password);
     }
 
     Future<void> logout() async{

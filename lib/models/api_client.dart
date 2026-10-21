@@ -1,6 +1,9 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'api_endpoints.dart';
 import '../models/token_storage.dart';
+import '../main.dart';
+import 'package:flutter_application_1/routes/app_routes.dart';
 
 class ApiClient {
   late final Dio _dio;
@@ -36,6 +39,19 @@ class ApiClient {
           // If token expired or is invalid (401), clear the token
           if (e.response?.statusCode == 401) {
             await TokenStorage.deleteToken();
+
+            scaffoldMessengerKey.currentState?.showSnackBar(
+              const SnackBar(
+                content: Text('Session expired. Please log in again'),
+                backgroundColor: Colors.redAccent,
+                duration: Duration(seconds: 4),
+              ),
+            );
+            //kick the user to login screen :)
+            navigatorKey.currentState?.pushNamedAndRemoveUntil(
+              AppRoutes.loginRoute,
+              (route) => false,
+            );
           }
           return handler.next(e);
         },
@@ -49,7 +65,10 @@ class ApiClient {
   }
 
   // GET
-  Future<Response> get(String path, {Map<String, dynamic>? queryParameters}) async {
+  Future<Response> get(
+    String path, {
+    Map<String, dynamic>? queryParameters,
+  }) async {
     try {
       return await _dio.get(path, queryParameters: queryParameters);
     } on DioException catch (e) {
@@ -86,7 +105,8 @@ class ApiClient {
 
   Exception _errorHandler(DioException e) {
     if (e.response != null) {
-      final serverMessage = e.response?.data is Map && e.response?.data['message'] != null
+      final serverMessage =
+          e.response?.data is Map && e.response?.data['message'] != null
           ? e.response?.data['message']
           : '${e.response?.statusCode} - ${e.response?.statusMessage}';
       return Exception(serverMessage);
