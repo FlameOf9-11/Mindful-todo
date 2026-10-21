@@ -9,7 +9,7 @@ A clean, modern, and mindful productivity app designed to keep your daily tasks 
 [![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
 [![GitHub Release](https://img.shields.io/github/v/release/FlameOf9-11/Mindful-todo?style=for-the-badge&color=345444)](https://github.com/FlameOf9-11/Mindful-todo/releases/latest)
-[![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS%20%7C%20Web-lightgrey?style=for-the-badge)](https://github.com/FlameOf9-11/Mindful-todo)
+[![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/FlameOf9-11/Mindful-todo)
 
 [Download APK](https://github.com/FlameOf9-11/Mindful-todo/releases/latest) • [Features](#-features) • [Quick Start](#-getting-started) • [Architecture](#-project-structure) • [Tech Stack](#-tech-stack)
 
@@ -63,12 +63,12 @@ You can immediately install the latest pre-compiled Android release:
 
 | Category | Technology | Purpose |
 | :--- | :--- | :--- |
-| **Framework** | [Flutter](https://flutter.dev) | Cross-platform UI toolkit |
+| **Framework** | [Flutter](https://flutter.dev) | Android mobile UI toolkit |
 | **Language** | [Dart](https://dart.dev) | Modern typed language |
 | **Networking** | [Dio](https://pub.dev/packages/dio) & [Http](https://pub.dev/packages/http) | REST API requests and interceptors |
-| **Secure Storage** | [flutter_secure_storage](https://pub.dev/packages/flutter_secure_storage) | Keychain & KeyStore encrypted token persistence |
+| **Secure Storage** | [flutter_secure_storage](https://pub.dev/packages/flutter_secure_storage) | Android KeyStore encrypted token persistence |
 | **Typography** | [google_fonts](https://pub.dev/packages/google_fonts) | Clean typography |
-| **Icons** | [cupertino_icons](https://pub.dev/packages/cupertino_icons) & [flutter_launcher_icons](https://pub.dev/packages/flutter_launcher_icons) | Adaptive icons & launcher branding |
+| **Icons** | [cupertino_icons](https://pub.dev/packages/cupertino_icons) & [flutter_launcher_icons](https://pub.dev/packages/flutter_launcher_icons) | Android launcher icons & UI icons |
 
 ---
 
@@ -106,7 +106,7 @@ Follow these steps to run the application locally from source:
 ### Prerequisites
 - [Flutter SDK](https://docs.flutter.dev/get-started/install) (`^3.11.5` or higher)
 - Android Studio, VS Code, or Antigravity IDE with Flutter & Dart extensions
-- An Android Emulator, iOS Simulator, or connected physical device
+- An Android Emulator or connected physical Android device (with USB debugging enabled)
 
 ### 1. Clone the Repository
 ```bash
